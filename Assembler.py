@@ -114,6 +114,6 @@ with open("input.txt",'r') as file:
         print(binary_output)
 
         #shreyas is a gay
-        
+        #shreyas is binary
     
 
