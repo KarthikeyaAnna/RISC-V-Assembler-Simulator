@@ -113,7 +113,7 @@ with open("input.txt",'r') as file:
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
         print(binary_output)
 
-
+        #changes are made
         
     
 
