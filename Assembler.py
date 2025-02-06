@@ -115,5 +115,12 @@ with open("input.txt",'r') as file:
 
         #shreyas is a gay
         #shreyas is binary
+        
+
+        #guys list_line_sep is the list containing ["add","sr","s1","s2"]
+        #if any line is not getting tokenized just let me know.
+        #to create your instruction ; just create a if condintion weather the instruction is present in instructions and write your code under it
+        #to store your answer use binary_output
+        
     
 
