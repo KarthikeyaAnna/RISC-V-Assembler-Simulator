@@ -81,6 +81,7 @@ data = {
     }
 }
 def convert(x):
+    
     y=12
     a=""
     x=int(x)
@@ -94,6 +95,8 @@ def convert(x):
         x=x//2
         y=y-1
     return a
+
+
 with open("input.txt",'r') as file:
     
     for line in file:
@@ -126,11 +129,13 @@ with open("input.txt",'r') as file:
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
         print(binary_output)
 
-        #sri is a gay
-        #sri is binary
-        
         #classify the instruction as I type
         if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
+            if '(' in list_line_sep[2]:
+                split_value=list_line_sep[2].strip('()').split('(')
+                list_line_sep.pop(2)
+                list_line_sep.insert(2,split_value[1]) 
+                list_line_sep.insert(2,split_value[0])
             if(len(list_line_sep)!=4): # dont know
                 binary_output="ERROR"
             else:
@@ -143,6 +148,7 @@ with open("input.txt",'r') as file:
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
             if(len(list_line_sep)!=4): # dont know
                 binary_output="ERROR"
+                
             else:
                 r2=list_line_sep[1]
                 r1=list_line_sep[3]
@@ -150,8 +156,14 @@ with open("input.txt",'r') as file:
                 imm_11_5=netimm[:7]
                 imm_4_0=netimm[7:]
                 binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
+                if int(netimm)>2**12:
+                    binary_output="Error" 
         print(binary_output)
-        
+                
+            
+                
+
+            
         
 
         #guys list_line_sep is the list containing ["add","sr","s1","s2"]
@@ -160,4 +172,3 @@ with open("input.txt",'r') as file:
         #to store your answer use binary_output
         
     
-
