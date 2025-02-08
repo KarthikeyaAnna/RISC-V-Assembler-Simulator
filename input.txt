@@ -1,3 +1,4 @@
 add s1, s2, s3
 add s8
-adds4,s5
+add s4,s5
+addi s1, s2 ,10

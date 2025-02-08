@@ -127,7 +127,7 @@ with open("input.txt",'r') as file:
                 binary_output+=data["FUNCT7"][instruction]
                 #2)rs2,rs1,func3,rd,opcode
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-        print(binary_output)
+        
 
         #classify the instruction as I type
         if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
@@ -143,7 +143,7 @@ with open("input.txt",'r') as file:
                 r1=list_line_sep[2]
                 imm=list_line_sep[3]
                 binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-        print(binary_output)
+       
         
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
             if(len(list_line_sep)!=4): # dont know
