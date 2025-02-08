@@ -80,7 +80,20 @@ data = {
         "t6": "11111"
     }
 }
-
+def convert(x):
+    y=12
+    a=""
+    x=int(x)
+    if x<0:
+      x=x+4096
+    while y>0:
+        if x%2==0:
+            a="0"+a
+        else:
+            a="1"+a
+        x=x//2
+        y=y-1
+    return a
 with open("input.txt",'r') as file:
     
     for line in file:
@@ -113,8 +126,32 @@ with open("input.txt",'r') as file:
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
         print(binary_output)
 
-        #shreyas is a gay
-        #shreyas is binary
+        #sri is a gay
+        #sri is binary
+        
+        #classify the instruction as I type
+        if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
+            if(len(list_line_sep)!=4): # dont know
+                binary_output="ERROR"
+            else:
+                rd=list_line_sep[1]
+                r1=list_line_sep[2]
+                imm=list_line_sep[3]
+                binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
+        print(binary_output)
+        
+        if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
+            if(len(list_line_sep)!=4): # dont know
+                binary_output="ERROR"
+            else:
+                r2=list_line_sep[1]
+                r1=list_line_sep[3]
+                netimm=convert(list_line_sep[2])
+                imm_11_5=netimm[:7]
+                imm_4_0=netimm[7:]
+                binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
+        print(binary_output)
+        
         
 
         #guys list_line_sep is the list containing ["add","sr","s1","s2"]
