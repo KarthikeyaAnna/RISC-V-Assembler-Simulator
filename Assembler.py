@@ -170,6 +170,46 @@ with open("input.txt",'r') as file:
             binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
             if int(netimm)>2**12:
                 binary_output="Error" 
+
+
+        
+        def convert20bit(x):
+            y=20
+            a=""
+            x=int(x)
+            if x<0:
+                x=x+2**y
+            while y>0:
+                if x%2==0:
+                    a="0"+a
+                else:
+                    a="1"+a
+                x=x//2
+                y=y-1
+            return a
+        
+        #classify the instruction as B type
+        if(instruction in data["INSTRUCTION_FORMATS"]["B"]):
+            if(len(list_line_sep)!=4): 
+                binary_output="ERROR"
+            else:
+                r1=list_line_sep[1]
+                r2=list_line_sep[2]
+                imm=list_line_sep[3]
+                newimm=convert(imm)
+                imm_11_5=newimm[:7]
+                imm_4_0=newimm[7:]
+                binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
+
+        #classify the instruction as J type
+        if(instruction in data["INSTRUCTION_FORMATS"]["J"]):
+            if(len(list_line_sep)!=3): 
+                binary_output="ERROR"
+            else:
+                rd=list_line_sep[1]
+                imm=list_line_sep[2]
+                newimm=convert20bit(imm)
+                binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
         print(binary_output)
                 
             
