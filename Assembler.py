@@ -110,6 +110,10 @@ with open("input.txt",'r') as file:
             for i in new:
                 list_line_sep.append(i)
         print(list_line_sep)
+        if("start" in list_line_sep[0]):
+            
+            list_line_sep.pop(0)
+        
         
         
         instruction=list_line_sep[0]
