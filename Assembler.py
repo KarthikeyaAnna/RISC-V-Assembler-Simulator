@@ -81,7 +81,7 @@ data = {
     }
 }
 def convert(x):
-    
+
     y=12
     a=""
     x=int(x)
@@ -98,8 +98,10 @@ def convert(x):
 
 
 with open("input.txt",'r') as file:
-    
+    program_counter=-4
+
     for line in file:
+        program_counter+=4
         line=line.strip()
         list_line_sep=line.split(" ")
         for i in range(len(list_line_sep)):
@@ -110,13 +112,14 @@ with open("input.txt",'r') as file:
             for i in new:
                 list_line_sep.append(i)
         print(list_line_sep)
-        if("start" in list_line_sep[0]):
+        if(list_line_sep[0 in data["OPCODES"]]):
+            instruction=list_line_sep[0]
+        else:
+            continue
             
-            list_line_sep.pop(0)
+
+
         
-        
-        
-        instruction=list_line_sep[0]
         binary_output=""
         #classify the instruction as R type
         if(instruction in data["INSTRUCTION_FORMATS"]["R"]):
@@ -131,7 +134,7 @@ with open("input.txt",'r') as file:
                 binary_output+=data["FUNCT7"][instruction]
                 #2)rs2,rs1,func3,rd,opcode
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-        
+
 
         #classify the instruction as I type
         if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
@@ -147,7 +150,7 @@ with open("input.txt",'r') as file:
                     imm=list_line_sep[2]
                     r1=list_line_sep[3]
                     binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-                
+
             else:
                 if len(list_line_sep)!=4:
                     binary_output="ERROR"
@@ -156,8 +159,8 @@ with open("input.txt",'r') as file:
                     r1=list_line_sep[2]
                     imm=list_line_sep[3]
                     binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-       
-        
+            print(binary_output)
+
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
             if (len(list_line_sep)>4 or len(list_line_sep)<3):
                 binary_output="ERROR: Invalid Format"
@@ -198,7 +201,7 @@ with open("input.txt",'r') as file:
                         binary_output="Error"
 
 
-        
+
         def convert20bit(x):
             y=20
             a=""
@@ -213,40 +216,100 @@ with open("input.txt",'r') as file:
                 x=x//2
                 y=y-1
             return a
-        
+
         #classify the instruction as B type
         if(instruction in data["INSTRUCTION_FORMATS"]["B"]):
             if(len(list_line_sep)!=4): 
                 binary_output="ERROR"
             else:
-                r1=list_line_sep[1]
-                r2=list_line_sep[2]
-                imm=list_line_sep[3]
-                newimm=convert(imm)
-                imm_11_5=newimm[:7]
-                imm_4_0=newimm[7:]
-                binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
+                if (list_line_sep[3].isdigit()):
+
+                    r1=list_line_sep[1]
+                    r2=list_line_sep[2]
+                    imm=list_line_sep[3]
+                    print(imm)
+                    newimm=convert(imm)
+                    bit_12=newimm[0]
+                    bit_11=newimm[1] 
+                    bits_5_to_10=newimm[2:8]
+                    bits_1_to_4=newimm[8:]
+                    binary_output+=bit_12+bits_5_to_10+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+bits_1_to_4+bit_11+data["OPCODES"][instruction]
+                else:
+                    label=(list_line_sep[3])
+                    print(label)
+                    print(program_counter)
+                    newprogramcounter=-4
+                    with open("input.txt", "r") as temp_file:
+                        for line in temp_file:
+                            newprogramcounter+=4
+                            line=line.strip()
+                            listlinesep=line.split(" ")
+                            for i in range(len(listlinesep)):
+                                listlinesep[i]=listlinesep[i].strip(',')
+                                if(',' in listlinesep[-1]):
+                                    neww=listlinesep[i].split(',')
+                                    listlinesep.pop(-1)
+                                    for i in neww:
+                                        listlinesep.append(i)
+                            
+                            if ((listlinesep[0])[:-1])==label:
+                                print(program_counter)
+                                print(newprogramcounter)
+                                break
+                    offset_encoding=(newprogramcounter-program_counter)//2
+                    newimm=convert(offset_encoding)
+                    
+                    r1=list_line_sep[1]
+                    r2=list_line_sep[2]
+                    bit_12=newimm[0]
+                    bit_11=newimm[1] 
+                    bits_5_to_10=newimm[2:8]
+                    bits_1_to_4=newimm[8:]
+                    binary_output+=bit_12+bits_5_to_10+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+bits_1_to_4+bit_11+data["OPCODES"][instruction]
+            print(binary_output)
+        
+
+
+
+        
+
+
 
         #classify the instruction as J type
         if(instruction in data["INSTRUCTION_FORMATS"]["J"]):
             if(len(list_line_sep)!=3): 
                 binary_output="ERROR"
             else:
-                rd=list_line_sep[1]
-                imm=list_line_sep[2]
-                newimm=convert20bit(imm)
-                binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-        print(binary_output)
-                
-            
-                
+                if (list_line_sep[2].isdigit()):
 
-            
-        
+                    rd=list_line_sep[1]
+                    imm=list_line_sep[2]
+                    newimm=convert20bit(imm)
+                    binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
+                else:
+                    label=(list_line_sep[2])
+                    newprogramcounter=-4
+                    with open("input.txt", "r") as temp_file:
+                        for line in temp_file:
+                            newprogramcounter+=4
+                            line=line.strip()
+                            listlinesep=line.split(" ")
+                            for i in range(len(listlinesep)):
+                                listlinesep[i]=listlinesep[i].strip(',')
+                                if(',' in listlinesep[-1]):
+                                    neww=listlinesep[i].split(',')
+                                    listlinesep.pop(-1)
+                                    for i in neww:
+                                        listlinesep.append(i)
+                            
+                            if ((listlinesep[0])[:-1])==label:
+                                print(program_counter)
+                                print(newprogramcounter)
+                                break
+                    offset_encoding=(newprogramcounter-program_counter)//2
+                    newimm=convert20bit(offset_encoding)
+                    rd=list_line_sep[1]
+                    binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
+            print(binary_output)
 
-        #guys list_line_sep is the list containing ["add","sr","s1","s2"]
-        #if any line is not getting tokenized just let me know.
-        #to create your instruction ; just create a if condintion weather the instruction is present in instructions and write your code under it
-        #to store your answer use binary_output
-        
-    
+          
