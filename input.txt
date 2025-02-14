@@ -1,1 +1,1 @@
-start: add ra,sp,gp
+sw s3,4(s6)
