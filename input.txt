@@ -1,2 +1,2 @@
-sw s4,23(s4)
-
+start: add,s1,s2,s3
+label: addi,s1,s1,34

@@ -118,12 +118,16 @@ with open("input.txt",'r') as file:
             continue
             
 
-
+        if(list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["S"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["I"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["B"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["J"]):
+            list_line_sep.pop(0)
+            instruction=list_line_sep[0]
         
         binary_output=""
         #classify the instruction as R type
-        if(instruction in data["INSTRUCTION_FORMATS"]["R"]):
-
+        if(instruction  in data["INSTRUCTION_FORMATS"]["R"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
+            if( list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
+                list_line_sep.pop(0)
+                instruction=list_line_sep[0]
             if(len(list_line_sep)!=4):
                 binary_output="ERROR"
             else:
@@ -159,7 +163,7 @@ with open("input.txt",'r') as file:
                     r1=list_line_sep[2]
                     imm=list_line_sep[3]
                     binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-            print(binary_output)
+          
 
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
             if (len(list_line_sep)>4 or len(list_line_sep)<3):
@@ -227,7 +231,7 @@ with open("input.txt",'r') as file:
                     r1=list_line_sep[1]
                     r2=list_line_sep[2]
                     imm=list_line_sep[3]
-                    print(imm)
+                
                     newimm=convert(imm)
                     bit_12=newimm[0]
                     bit_11=newimm[1] 
@@ -236,8 +240,7 @@ with open("input.txt",'r') as file:
                     binary_output+=bit_12+bits_5_to_10+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+bits_1_to_4+bit_11+data["OPCODES"][instruction]
                 else:
                     label=(list_line_sep[3])
-                    print(label)
-                    print(program_counter)
+                  
                     newprogramcounter=-4
                     with open("input.txt", "r") as temp_file:
                         for line in temp_file:
@@ -253,8 +256,7 @@ with open("input.txt",'r') as file:
                                         listlinesep.append(i)
                             
                             if ((listlinesep[0])[:-1])==label:
-                                print(program_counter)
-                                print(newprogramcounter)
+                               
                                 break
                     offset_encoding=(newprogramcounter-program_counter)//2
                     newimm=convert(offset_encoding)
@@ -266,7 +268,7 @@ with open("input.txt",'r') as file:
                     bits_5_to_10=newimm[2:8]
                     bits_1_to_4=newimm[8:]
                     binary_output+=bit_12+bits_5_to_10+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+bits_1_to_4+bit_11+data["OPCODES"][instruction]
-            print(binary_output)
+           
         
 
 
@@ -308,8 +310,7 @@ with open("input.txt",'r') as file:
                                         listlinesep.append(i)
                             
                             if ((listlinesep[0])[:-1])==label:
-                                print(program_counter)
-                                print(newprogramcounter)
+                               
                                 break
                     offset_encoding=(newprogramcounter-program_counter)//2
                     newimm=convert20bit(offset_encoding)
@@ -319,6 +320,6 @@ with open("input.txt",'r') as file:
                     bit_11 = newimm[9]        
                     bits_19_12 = newimm[1:9]
                     binary_output+=bit_20+bits_10_1+bit_11+bits_19_12+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-            print(binary_output)
+        print(binary_output)
 
           
