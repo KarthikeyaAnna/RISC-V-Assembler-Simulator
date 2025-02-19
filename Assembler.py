@@ -119,7 +119,7 @@ with open(inputfile,'r') as file:
             list_line_sep.pop(-1)
             for i in new:
                 list_line_sep.append(i)
-        #print(list_line_sep)
+        
         if(list_line_sep[0 in data["OPCODES"]]):
             instruction=list_line_sep[0]
         else:
@@ -131,7 +131,7 @@ with open(inputfile,'r') as file:
             instruction=list_line_sep[0]
         
         binary_output=""
-        #classify the instruction as R type
+        
         if(instruction  in data["INSTRUCTION_FORMATS"]["R"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
             if( list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
                 list_line_sep.pop(0)
@@ -148,7 +148,7 @@ with open(inputfile,'r') as file:
                 binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
 
 
-        #classify the instruction as I type
+        
         if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
             if '(' in list_line_sep[2]:
                 split_value=list_line_sep[2].strip('()').split('(')
@@ -224,31 +224,31 @@ with open(inputfile,'r') as file:
 
 
         def convert20bit(x):
-            x = int(x) & 0xFFFFF  # Ensure 20-bit two's complement format
+            x = int(x) & 0xFFFFF  
             return format(x, '020b')
 
-        #classify the instruction as B type
-                # classify the instruction as B type
+        
+                
         if ':' in list_line_sep[0]:
             parts = list_line_sep[0].split(':')
-            # Replace the first token with the instruction part (e.g. "beq")
+        
             list_line_sep[0] = parts[1].strip()
             instruction=list_line_sep[0]
        
 
         if instruction in data["INSTRUCTION_FORMATS"]["B"]:
-            if len(list_line_sep) != 4:
-                binary_output = "ERROR"
+            if len(list_line_sep)!=4:
+                binary_output="ERROR"
             else:
-                r1 = list_line_sep[1]   # rs1
-                r2 = list_line_sep[2]   # rs2
-                target = list_line_sep[3]  # branch target (label or immediate)
+                r1=list_line_sep[1]   
+                r2=list_line_sep[2]   
+                target = list_line_sep[3]  
 
-                # Process if target is not purely numeric (i.e. a label)
+            
                 if not target.lstrip('-').isdigit():
-                    label = target
-                    search_pc = -4
-                    found_pc = None
+                    label=target
+                    search_pc=-4
+                    found_pc=None
 
                     with open(inputfile, "r") as temp_file:
                         for line in temp_file:
@@ -258,108 +258,86 @@ with open(inputfile,'r') as file:
                                 continue
 
                             if ':' in line:
-                                current_label = line.split(':')[0].strip()
-                                if current_label == label:
-                                    found_pc = search_pc
+                                current_label=line.split(':')[0].strip()
+                                if current_label==label:
+                                    found_pc=search_pc
                                     break
 
                     if found_pc is None:
-                        binary_output = "ERROR"
+                        binary_output="ERROR"
                     else:
-                        # Calculate branch offset (branch offsets are in 2-byte increments)
-                        offset = (found_pc - program_counter) // 2
+                        
+                        offset=(found_pc-program_counter)//2
 
-                        # For negative offsets, perform sign extension (using 13 bits then taking lower 12 bits)
+                        
                         if offset < 0:
-                            offset = (1 << 13) + offset
-                        newimm = format(offset & 0xFFF, '012b')  # 12-bit binary string
+                            offset=(1 << 13)+offset
+                        newimm=format(offset & 0xFFF,'012b')  
 
-                        # Reorder the bits for B-type: 
-                        # newimm[0] -> imm[12], newimm[1] -> imm[11], newimm[2:8] -> imm[10:5], newimm[8:12] -> imm[4:1]
-                        bit_12    = newimm[0]
-                        bit_11    = newimm[1]
-                        bits_10_5 = newimm[2:8]
-                        bits_4_1  = newimm[8:12]
+                        
+                        
+                        bit_12=newimm[0]
+                        bit_11=newimm[1]
+                        bits_10_5=newimm[2:8]
+                        bits_4_1=newimm[8:12]
 
-                        binary_output = (
-                            bit_12 +
-                            bits_10_5 +
-                            data["REGISTER_MAP"][r2] +
-                            data["REGISTER_MAP"][r1] +
-                            data["FUNCT3"][instruction] +
-                            bits_4_1 +
-                            bit_11 +
-                            data["OPCODES"][instruction]
-                        )
+                        binary_output = (bit_12 +bits_10_5 +data["REGISTER_MAP"][r2] +data["REGISTER_MAP"][r1] +data["FUNCT3"][instruction] +bits_4_1 +bit_11 +data["OPCODES"][instruction])
                 else:
-                    # If the target is a numeric immediate:
-                    imm = int(target) // 2
-                    if imm < 0:
-                        imm = (1 << 12) + imm
-                    newimm = format(imm & 0xFFF, '012b')
+                    
+                    imm=int(target)//2
+                    if imm<0:
+                        imm=(1<<12)+imm
+                    newimm=format(imm & 0xFFF,'012b')
 
-                    bit_12    = newimm[0]
-                    bit_11    = newimm[1]
-                    bits_10_5 = newimm[2:8]
-                    bits_4_1  = newimm[8:12]
+                    bit_12=newimm[0]
+                    bit_11=newimm[1]
+                    bits_10_5=newimm[2:8]
+                    bits_4_1=newimm[8:12]
 
-                    binary_output = (
-                        bit_12 +
-                        bits_10_5 +
-                        data["REGISTER_MAP"][r2] +
-                        data["REGISTER_MAP"][r1] +
-                        data["FUNCT3"][instruction] +
-                        bits_4_1 +
-                        bit_11 +
-                        data["OPCODES"][instruction]
-                    )
+                    binary_output = (bit_12 +bits_10_5 +data["REGISTER_MAP"][r2] +data["REGISTER_MAP"][r1] +data["FUNCT3"][instruction] +bits_4_1 +bit_11 +data["OPCODES"][instruction])
 
         
         if instruction in data["INSTRUCTION_FORMATS"]["J"]:
-            if len(list_line_sep) != 3:
-                binary_output = "ERROR"
+            if len(list_line_sep)!=3:
+                binary_output="ERROR"
             else:
                 if list_line_sep[2].lstrip('-').isdigit():
 
 
-                    rd = list_line_sep[1]
-                    imm = list_line_sep[2]
-                    # For JAL, the immediate must be divided by 2 before conversion.
-                    newimm = convert20bit(int(imm) // 2)
-                    bit_20    = newimm[0]          # imm[20]
-                    bits_10_1 = newimm[10:20]       # imm[10:1]
-                    bit_11    = newimm[9]           # imm[11]
-                    bits_19_12= newimm[1:9]         # imm[19:12]
-                    binary_output += (bit_20 + bits_10_1 + bit_11 + bits_19_12 +
-                                    data["REGISTER_MAP"][rd] +
-                                    data["OPCODES"][instruction])
+                    rd=list_line_sep[1]
+                    imm=list_line_sep[2]
+                    
+                    newimm=convert20bit(int(imm)// 2)
+                    bit_20=newimm[0]
+                    bits_10_1=newimm[10:20]       
+                    bit_11=newimm[9]           
+                    bits_19_12=newimm[1:9]         
+                    binary_output+=(bit_20 + bits_10_1 + bit_11 + bits_19_12 +data["REGISTER_MAP"][rd] +data["OPCODES"][instruction])
                 else:
-                    label = list_line_sep[2]
-                    newprogramcounter = -4
+                    label=list_line_sep[2]
+                    newprogramcounter=-4
                     with open(inputfile, "r") as temp_file:
                         for line in temp_file:
-                            newprogramcounter += 4
-                            line = line.strip()
-                            listlinesep = line.split(" ")
+                            newprogramcounter+=4
+                            line=line.strip()
+                            listlinesep=line.split(" ")
                             for i in range(len(listlinesep)):
-                                listlinesep[i] = listlinesep[i].strip(',')
+                                listlinesep[i]=listlinesep[i].strip(',')
                                 if ',' in listlinesep[-1]:
-                                    neww = listlinesep[i].split(',')
+                                    neww=listlinesep[i].split(',')
                                     listlinesep.pop(-1)
                                     for i in neww:
                                         listlinesep.append(i)
-                            if listlinesep[0][:-1] == label:
+                            if listlinesep[0][:-1]==label:
                                 break
-                    offset_encoding = (newprogramcounter - program_counter) // 2
-                    newimm = convert20bit(offset_encoding)
-                    rd = list_line_sep[1]
-                    bit_20    = newimm[0]
-                    bits_10_1 = newimm[10:20]
-                    bit_11    = newimm[9]
-                    bits_19_12= newimm[1:9]
-                    binary_output += (bit_20 + bits_10_1 + bit_11 + bits_19_12 +
-                                    data["REGISTER_MAP"][rd] +
-                                    data["OPCODES"][instruction])
+                    offset_encoding=(newprogramcounter - program_counter)// 2
+                    newimm=convert20bit(offset_encoding)
+                    rd=list_line_sep[1]
+                    bit_20=newimm[0]
+                    bits_10_1=newimm[10:20]
+                    bit_11=newimm[9]
+                    bits_19_12=newimm[1:9]
+                    binary_output+=(bit_20 + bits_10_1 + bit_11 + bits_19_12 +data["REGISTER_MAP"][rd] +data["OPCODES"][instruction])
       
 
         s+=binary_output+"\n"
