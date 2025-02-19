@@ -103,15 +103,17 @@ with open("input.txt",'r') as file:
     for line in file:
         program_counter+=4
         line=line.strip()
+        print(line)
         list_line_sep=line.split(" ")
         for i in range(len(list_line_sep)):
             list_line_sep[i]=list_line_sep[i].strip(',')
         if(',' in list_line_sep[-1]):
             new=list_line_sep[i].split(',')
+            
             list_line_sep.pop(-1)
             for i in new:
                 list_line_sep.append(i)
-        print(list_line_sep)
+        #print(list_line_sep)
         if(list_line_sep[0 in data["OPCODES"]]):
             instruction=list_line_sep[0]
         else:
@@ -240,6 +242,7 @@ with open("input.txt",'r') as file:
                     r1=list_line_sep[1]
                     r2=list_line_sep[2]
                     imm=list_line_sep[3]
+                    
                 
                     newimm=convert(imm)
                     bit_12=newimm[0]
@@ -247,6 +250,7 @@ with open("input.txt",'r') as file:
                     bits_5_to_10=newimm[2:8]
                     bits_1_to_4=newimm[8:]
                     binary_output+=bit_12+bits_5_to_10+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+bits_1_to_4+bit_11+data["OPCODES"][instruction]
+                    
                 else:
                     label=(list_line_sep[3])
                   
