@@ -285,7 +285,12 @@ with open("input.txt",'r') as file:
                     rd=list_line_sep[1]
                     imm=list_line_sep[2]
                     newimm=convert20bit(imm)
-                    binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
+                    bit_20 = newimm[0]        
+                    bits_10_1 = newimm[10:20] 
+                    bit_11 = newimm[9]        
+                    bits_19_12 = newimm[1:9]
+                    
+                    binary_output+=bit_20+bits_10_1+bit_11+bits_19_12+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
                 else:
                     label=(list_line_sep[2])
                     newprogramcounter=-4
@@ -309,7 +314,11 @@ with open("input.txt",'r') as file:
                     offset_encoding=(newprogramcounter-program_counter)//2
                     newimm=convert20bit(offset_encoding)
                     rd=list_line_sep[1]
-                    binary_output+=newimm+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
+                    bit_20 = newimm[0]        
+                    bits_10_1 = newimm[10:20] 
+                    bit_11 = newimm[9]        
+                    bits_19_12 = newimm[1:9]
+                    binary_output+=bit_20+bits_10_1+bit_11+bits_19_12+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
             print(binary_output)
 
           
