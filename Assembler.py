@@ -164,13 +164,14 @@ with open("input.txt",'r') as file:
                     imm=list_line_sep[3]
                     binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
           
-
+        
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
             if (len(list_line_sep)>4 or len(list_line_sep)<3):
                 binary_output="ERROR: Invalid Format"
             else:
                 if len(list_line_sep)==3:
                     split_value=list_line_sep[2].strip('()').split('(')
+                    
                     if len(split_value)!=2:
                         binary_output="ERROR: Invalid Format"
                     
@@ -178,16 +179,23 @@ with open("input.txt",'r') as file:
                         list_line_sep.pop(2)
                         list_line_sep.insert(2,split_value[1]) 
                         list_line_sep.insert(2,split_value[0])
+                        
+                        
                         if(list_line_sep[3].isdigit()):
+                            
                             binary_output="ERROR"
                         else:
                             r2=list_line_sep[1]
                             r1=list_line_sep[3]
+                            
                             netimm=convert(list_line_sep[2])
+                            
                             imm_11_5=netimm[:7]
                             imm_4_0=netimm[7:]
+                            
                             binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
-                            if int(netimm)>2**12:
+                            if int(list_line_sep[2])>2**12:
+                                
                                 binary_output="Error"
                    
                 elif len(list_line_sep)==4: 
@@ -202,6 +210,7 @@ with open("input.txt",'r') as file:
                     imm_4_0=netimm[7:]
                     binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
                     if int(netimm)>2**12:
+                        
                         binary_output="Error"
 
 
