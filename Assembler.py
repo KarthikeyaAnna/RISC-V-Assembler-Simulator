@@ -1,3 +1,5 @@
+import sys
+
 data = {
     "INSTRUCTION_FORMATS": {
         "R": ["add", "sub", "slt", "srl", "or", "and"],
@@ -97,7 +99,11 @@ def convert(x):
     return a
 
 
-with open("input.txt",'r') as file:
+s=""
+inputfile=sys.argv[-2]
+outputfile=sys.argv[-1]
+
+with open(inputfile,'r') as file:
     program_counter=-4
 
     for line in file:
@@ -255,7 +261,7 @@ with open("input.txt",'r') as file:
                     label=(list_line_sep[3])
                   
                     newprogramcounter=-4
-                    with open("input.txt", "r") as temp_file:
+                    with open(inputfile, "r") as temp_file:
                         for line in temp_file:
                             newprogramcounter+=4
                             line=line.strip()
@@ -309,7 +315,7 @@ with open("input.txt",'r') as file:
                 else:
                     label=(list_line_sep[2])
                     newprogramcounter=-4
-                    with open("input.txt", "r") as temp_file:
+                    with open(inputfile, "r") as temp_file:
                         for line in temp_file:
                             newprogramcounter+=4
                             line=line.strip()
@@ -333,6 +339,12 @@ with open("input.txt",'r') as file:
                     bit_11 = newimm[9]        
                     bits_19_12 = newimm[1:9]
                     binary_output+=bit_20+bits_10_1+bit_11+bits_19_12+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-        print(binary_output)
+
+        s+=binary_output+"\n"
+    with open(outputfile,"w") as shit:
+        shit.write(s)
+
+        
+        
 
           
