@@ -204,7 +204,7 @@ with open(inputfile,'r') as file:
                             binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
                             if int(list_line_sep[2])>2**12:
                                 
-                                binary_output="Error"
+                                binary_output="ERROR"
                    
                 elif len(list_line_sep)==4: 
                     split_value=list_line_sep[2].strip('()').split('(')
@@ -219,7 +219,7 @@ with open(inputfile,'r') as file:
                     binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
                     if int(netimm)>2**12:
                         
-                        binary_output="Error"
+                        binary_output="ERROR"
 
 
 
@@ -339,12 +339,11 @@ with open(inputfile,'r') as file:
                     bits_19_12=newimm[1:9]
                     binary_output+=(bit_20 + bits_10_1 + bit_11 + bits_19_12 +data["REGISTER_MAP"][rd] +data["OPCODES"][instruction])
       
-
+        if(binary_output=="ERROR"):
+            print("ERROR")
+            break
         s+=binary_output+"\n"
     with open(outputfile,"w") as shit:
         shit.write(s)
 
-        
-        
-
-          
+      
