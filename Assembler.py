@@ -109,7 +109,7 @@ with open(inputfile,'r') as file:
     for line in file:
         program_counter+=4
         line=line.strip()
-        print(line)
+        
         list_line_sep=line.split(" ")
         for i in range(len(list_line_sep)):
             list_line_sep[i]=list_line_sep[i].strip(',')
