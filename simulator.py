@@ -34,3 +34,19 @@ registerValues = { "00000" : 0,
                    "11110" : 0,
                    "11111" : 0}
 
+
+
+with open("input.txt", 'r') as file:
+    binary_list = [line.strip() for line in file.readlines()]
+   
+print(binary_list)
+
+# binary_list is your list witha ll the machine code inputs
+#we will use a while loop to iterate through each machine code especially to handle the labels
+#first we will have to classify if the machine code is of which instruction
+i=0
+while(True):
+    if(binary_list[i]=="0000000000000000000000001100011"):
+        break
+
+        
