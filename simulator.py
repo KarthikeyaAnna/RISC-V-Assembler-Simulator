@@ -450,6 +450,7 @@ class Simulator:
                 self.g.write("Invalid")
                 i = i + 1
                 self.PC = i * 4
+                break
 
         for j in self.Memory.keys():
             a = str(self.decimal_to_hexadecimal(j)) + ":" + "0b" + self.decimal_to_binary(self.Memory[j], 32)
