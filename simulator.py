@@ -380,7 +380,7 @@ class Simulator:
                     self.g_b.write("Invalid bonus instruction")
                     i += 1
                     self.PC = i * 4
-                    continue
+                    break
 
             opcode = self.data_in_list[i][25:32]
             instruction_type = self.opcode_define[opcode]
