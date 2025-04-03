@@ -82,268 +82,268 @@ data = {
         "t6": "11111"
     }
 }
-def convert(x):
 
-    y=12
-    a=""
-    x=int(x)
-    if x<0:
-      x=x+4096
-    while y>0:
-        if x%2==0:
-            a="0"+a
+def convert(x):
+    y = 12
+    a = ""
+    x = int(x)
+    if x < 0:
+        x = x + 4096
+    while y > 0:
+        if x % 2 == 0:
+            a = "0" + a
         else:
-            a="1"+a
-        x=x//2
-        y=y-1
+            a = "1" + a
+        x = x // 2
+        y = y - 1
     return a
 
+s = ""
+inputfile = sys.argv[-2]
+outputfile = sys.argv[-1]
 
-s=""
-inputfile=sys.argv[-2]
-outputfile=sys.argv[-1]
-
-with open(inputfile,'r') as file:
-    program_counter=-4
+with open(inputfile, 'r') as file:
+    program_counter = -4
 
     for line in file:
-        program_counter+=4
-        line=line.strip()
+        program_counter += 4
+        line = line.strip()
         
-        list_line_sep=line.split(" ")
+        list_line_sep = line.split(" ")
         for i in range(len(list_line_sep)):
-            list_line_sep[i]=list_line_sep[i].strip(',')
-        if(',' in list_line_sep[-1]):
-            new=list_line_sep[i].split(',')
-            
+            list_line_sep[i] = list_line_sep[i].strip(',')
+        if (',' in list_line_sep[-1]):
+            new = list_line_sep[i].split(',')
             list_line_sep.pop(-1)
             for i in new:
                 list_line_sep.append(i)
         
+        # -- BONUS INSTRUCTIONS HANDLING --
+        # Bonus: mul rd, rs1, rs2
+        if list_line_sep[0] == "mul":
+            if len(list_line_sep) != 4:
+                binary_output = "ERROR"
+            else:
+                rd = list_line_sep[1]
+                rs1 = list_line_sep[2]
+                rs2 = list_line_sep[3]
+                binary_output = "0000001" + data["REGISTER_MAP"][rs2] + data["REGISTER_MAP"][rs1] + "000" + data["REGISTER_MAP"][rd] + "0110011"
+            s += binary_output + "\n"
+            continue
+
+        # Bonus: rst (reset) with no operand
+        if list_line_sep[0] == "rst":
+            if len(list_line_sep) != 1:
+                binary_output = "ERROR"
+            else:
+                binary_output = "00000000000000000000000000000001"
+            s += binary_output + "\n"
+            continue
+
+        # Bonus: halt with no operand
+        if list_line_sep[0] == "halt":
+            if len(list_line_sep) != 1:
+                binary_output = "ERROR"
+            else:
+                binary_output = "00000000000000000000000000000010"
+            s += binary_output + "\n"
+            continue
+
+        # Bonus: rvrs as a reverse instruction with operands: rs1, rd, rvrs
+        if list_line_sep[-1] == "rvrs":
+            if len(list_line_sep) != 3:
+                binary_output = "ERROR"
+            else:
+                rs1 = list_line_sep[0]
+                rd = list_line_sep[1]
+                # For rvrs, we design an R-type–like format with:
+                # funct7: "0000000", rs2: "00000", rs1 as given, funct3: "000", rd as given, opcode: "1010101" (custom)
+                binary_output = "0000000" + "00000" + data["REGISTER_MAP"][rs1] + "000" + data["REGISTER_MAP"][rd] + "1010101"
+            s += binary_output + "\n"
+            continue
+        # -- END BONUS INSTRUCTIONS --
+
         if(list_line_sep[0 in data["OPCODES"]]):
-            instruction=list_line_sep[0]
+            instruction = list_line_sep[0]
         else:
             continue
             
-
         if(list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["S"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["I"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["B"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["J"]):
             list_line_sep.pop(0)
-            instruction=list_line_sep[0]
+            instruction = list_line_sep[0]
         
-        binary_output=""
+        binary_output = ""
         
         if(instruction  in data["INSTRUCTION_FORMATS"]["R"] or list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
             if( list_line_sep[1] in data["INSTRUCTION_FORMATS"]["R"]):
                 list_line_sep.pop(0)
-                instruction=list_line_sep[0]
-            if(len(list_line_sep)!=4):
-                binary_output="ERROR"
+                instruction = list_line_sep[0]
+            if(len(list_line_sep) != 4):
+                binary_output = "ERROR"
             else:
-                rd=list_line_sep[1]
-                r1=list_line_sep[2]
-                r2=list_line_sep[3]
-                #1)fun7
-                binary_output+=data["FUNCT7"][instruction]
-                #2)rs2,rs1,func3,rd,opcode
-                binary_output+=data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-
-
+                rd = list_line_sep[1]
+                r1 = list_line_sep[2]
+                r2 = list_line_sep[3]
+                # 1)funct7
+                binary_output += data["FUNCT7"][instruction]
+                # 2)rs2, rs1, func3, rd, opcode
+                binary_output += data["REGISTER_MAP"][r2] + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + data["REGISTER_MAP"][rd] + data["OPCODES"][instruction]
         
         if(instruction in data["INSTRUCTION_FORMATS"]["I"]):
             if '(' in list_line_sep[2]:
-                split_value=list_line_sep[2].strip('()').split('(')
+                split_value = list_line_sep[2].strip('()').split('(')
                 list_line_sep.pop(2)
-                list_line_sep.insert(2,split_value[1]) 
-                list_line_sep.insert(2,split_value[0])
-                if(len(list_line_sep)!=4):  
-                    binary_output="ERROR"
+                list_line_sep.insert(2, split_value[1]) 
+                list_line_sep.insert(2, split_value[0])
+                if(len(list_line_sep) != 4):  
+                    binary_output = "ERROR"
                 else:  
-                    rd=list_line_sep[1]
-                    imm=list_line_sep[2]
-                    r1=list_line_sep[3]
-                    binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-
+                    rd = list_line_sep[1]
+                    imm = list_line_sep[2]
+                    r1 = list_line_sep[3]
+                    binary_output += convert(imm) + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + data["REGISTER_MAP"][rd] + data["OPCODES"][instruction]
             else:
-                if len(list_line_sep)!=4:
-                    binary_output="ERROR"
+                if len(list_line_sep) != 4:
+                    binary_output = "ERROR"
                 else:
-                    rd=list_line_sep[1]
-                    r1=list_line_sep[2]
-                    imm=list_line_sep[3]
-                    binary_output+=convert(imm)+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+data["REGISTER_MAP"][rd]+data["OPCODES"][instruction]
-          
+                    rd = list_line_sep[1]
+                    r1 = list_line_sep[2]
+                    imm = list_line_sep[3]
+                    binary_output += convert(imm) + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + data["REGISTER_MAP"][rd] + data["OPCODES"][instruction]
         
         if(instruction in data["INSTRUCTION_FORMATS"]["S"]):
-            if (len(list_line_sep)>4 or len(list_line_sep)<3):
-                binary_output="ERROR: Invalid Format"
+            if (len(list_line_sep) > 4 or len(list_line_sep) < 3):
+                binary_output = "ERROR: Invalid Format"
             else:
-                if len(list_line_sep)==3:
-                    split_value=list_line_sep[2].strip('()').split('(')
-                    
-                    if len(split_value)!=2:
-                        binary_output="ERROR: Invalid Format"
-                    
+                if len(list_line_sep) == 3:
+                    split_value = list_line_sep[2].strip('()').split('(')
+                    if len(split_value) != 2:
+                        binary_output = "ERROR: Invalid Format"
                     else:
                         list_line_sep.pop(2)
-                        list_line_sep.insert(2,split_value[1]) 
-                        list_line_sep.insert(2,split_value[0])
-                        
-                        
+                        list_line_sep.insert(2, split_value[1]) 
+                        list_line_sep.insert(2, split_value[0])
                         if(list_line_sep[3].isdigit()):
-                            
-                            binary_output="ERROR"
+                            binary_output = "ERROR"
                         else:
-                            r2=list_line_sep[1]
-                            r1=list_line_sep[3]
-                            
-                            netimm=convert(list_line_sep[2])
-                            
-                            imm_11_5=netimm[:7]
-                            imm_4_0=netimm[7:]
-                            
-                            binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
-                            if int(list_line_sep[2])>2**12:
-                                
-                                binary_output="ERROR"
-                   
-                elif len(list_line_sep)==4: 
-                    split_value=list_line_sep[2].strip('()').split('(')
+                            r2 = list_line_sep[1]
+                            r1 = list_line_sep[3]
+                            netimm = convert(list_line_sep[2])
+                            imm_11_5 = netimm[:7]
+                            imm_4_0 = netimm[7:]
+                            binary_output += imm_11_5 + data["REGISTER_MAP"][r2] + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + imm_4_0 + data["OPCODES"][instruction]
+                            if int(list_line_sep[2]) > 2**12:
+                                binary_output = "ERROR"
+                elif len(list_line_sep) == 4: 
+                    split_value = list_line_sep[2].strip('()').split('(')
                     list_line_sep.pop(2)
-                    list_line_sep.insert(2,split_value[1]) 
-                    list_line_sep.insert(2,split_value[0])
-                    r2=list_line_sep[1]
-                    r1=list_line_sep[3]
-                    netimm=convert(list_line_sep[2])
-                    imm_11_5=netimm[:7]
-                    imm_4_0=netimm[7:]
-                    binary_output+=imm_11_5+data["REGISTER_MAP"][r2]+data["REGISTER_MAP"][r1]+data["FUNCT3"][instruction]+imm_4_0+data["OPCODES"][instruction]
-                    if int(netimm)>2**12:
-                        
-                        binary_output="ERROR"
-
-
+                    list_line_sep.insert(2, split_value[1]) 
+                    list_line_sep.insert(2, split_value[0])
+                    r2 = list_line_sep[1]
+                    r1 = list_line_sep[3]
+                    netimm = convert(list_line_sep[2])
+                    imm_11_5 = netimm[:7]
+                    imm_4_0 = netimm[7:]
+                    binary_output += imm_11_5 + data["REGISTER_MAP"][r2] + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + imm_4_0 + data["OPCODES"][instruction]
+                    if int(netimm) > 2**12:
+                        binary_output = "ERROR"
 
         def convert20bit(x):
             x = int(x) & 0xFFFFF  
             return format(x, '020b')
 
-        
-                
         if ':' in list_line_sep[0]:
             parts = list_line_sep[0].split(':')
-        
             list_line_sep[0] = parts[1].strip()
-            instruction=list_line_sep[0]
-       
+            instruction = list_line_sep[0]
 
         if instruction in data["INSTRUCTION_FORMATS"]["B"]:
-            if len(list_line_sep)!=4:
-                binary_output="ERROR"
+            if len(list_line_sep) != 4:
+                binary_output = "ERROR"
             else:
-                r1=list_line_sep[1]   
-                r2=list_line_sep[2]   
+                r1 = list_line_sep[1]   
+                r2 = list_line_sep[2]   
                 target = list_line_sep[3]  
-
-            
                 if not target.lstrip('-').isdigit():
-                    label=target
-                    search_pc=-4
-                    found_pc=None
-
+                    label = target
+                    search_pc = -4
+                    found_pc = None
                     with open(inputfile, "r") as temp_file:
                         for line in temp_file:
                             search_pc += 4
                             line = line.strip()
                             if not line:
                                 continue
-
                             if ':' in line:
-                                current_label=line.split(':')[0].strip()
-                                if current_label==label:
-                                    found_pc=search_pc
+                                current_label = line.split(':')[0].strip()
+                                if current_label == label:
+                                    found_pc = search_pc
                                     break
-
                     if found_pc is None:
-                        binary_output="ERROR"
+                        binary_output = "ERROR"
                     else:
-                        
-                        offset=(found_pc-program_counter)//2
-
-                        
+                        offset = (found_pc - program_counter) // 2
                         if offset < 0:
-                            offset=(1 << 13)+offset
-                        newimm=format(offset & 0xFFF,'012b')  
-
-                        
-                        
-                        bit_12=newimm[0]
-                        bit_11=newimm[1]
-                        bits_10_5=newimm[2:8]
-                        bits_4_1=newimm[8:12]
-
-                        binary_output = (bit_12 +bits_10_5 +data["REGISTER_MAP"][r2] +data["REGISTER_MAP"][r1] +data["FUNCT3"][instruction] +bits_4_1 +bit_11 +data["OPCODES"][instruction])
+                            offset = (1 << 13) + offset
+                        newimm = format(offset & 0xFFF, '012b')  
+                        bit_12 = newimm[0]
+                        bit_11 = newimm[1]
+                        bits_10_5 = newimm[2:8]
+                        bits_4_1 = newimm[8:12]
+                        binary_output = (bit_12 + bits_10_5 + data["REGISTER_MAP"][r2] + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + bits_4_1 + bit_11 + data["OPCODES"][instruction])
                 else:
-                    
-                    imm=int(target)//2
-                    if imm<0:
-                        imm=(1<<12)+imm
-                    newimm=format(imm & 0xFFF,'012b')
+                    imm = int(target) // 2
+                    if imm < 0:
+                        imm = (1 << 12) + imm
+                    newimm = format(imm & 0xFFF, '012b')
+                    bit_12 = newimm[0]
+                    bit_11 = newimm[1]
+                    bits_10_5 = newimm[2:8]
+                    bits_4_1 = newimm[8:12]
+                    binary_output = (bit_12 + bits_10_5 + data["REGISTER_MAP"][r2] + data["REGISTER_MAP"][r1] + data["FUNCT3"][instruction] + bits_4_1 + bit_11 + data["OPCODES"][instruction])
 
-                    bit_12=newimm[0]
-                    bit_11=newimm[1]
-                    bits_10_5=newimm[2:8]
-                    bits_4_1=newimm[8:12]
-
-                    binary_output = (bit_12 +bits_10_5 +data["REGISTER_MAP"][r2] +data["REGISTER_MAP"][r1] +data["FUNCT3"][instruction] +bits_4_1 +bit_11 +data["OPCODES"][instruction])
-
-        
         if instruction in data["INSTRUCTION_FORMATS"]["J"]:
-            if len(list_line_sep)!=3:
-                binary_output="ERROR"
+            if len(list_line_sep) != 3:
+                binary_output = "ERROR"
             else:
                 if list_line_sep[2].lstrip('-').isdigit():
-
-
-                    rd=list_line_sep[1]
-                    imm=list_line_sep[2]
-                    
-                    newimm=convert20bit(int(imm)// 2)
-                    bit_20=newimm[0]
-                    bits_10_1=newimm[10:20]       
-                    bit_11=newimm[9]           
-                    bits_19_12=newimm[1:9]         
-                    binary_output+=(bit_20 + bits_10_1 + bit_11 + bits_19_12 +data["REGISTER_MAP"][rd] +data["OPCODES"][instruction])
+                    rd = list_line_sep[1]
+                    imm = list_line_sep[2]
+                    newimm = convert20bit(int(imm) // 2)
+                    bit_20 = newimm[0]
+                    bits_10_1 = newimm[10:20]       
+                    bit_11 = newimm[9]           
+                    bits_19_12 = newimm[1:9]         
+                    binary_output += (bit_20 + bits_10_1 + bit_11 + bits_19_12 + data["REGISTER_MAP"][rd] + data["OPCODES"][instruction])
                 else:
-                    label=list_line_sep[2]
-                    newprogramcounter=-4
+                    label = list_line_sep[2]
+                    newprogramcounter = -4
                     with open(inputfile, "r") as temp_file:
                         for line in temp_file:
-                            newprogramcounter+=4
-                            line=line.strip()
-                            listlinesep=line.split(" ")
+                            newprogramcounter += 4
+                            line = line.strip()
+                            listlinesep = line.split(" ")
                             for i in range(len(listlinesep)):
-                                listlinesep[i]=listlinesep[i].strip(',')
+                                listlinesep[i] = listlinesep[i].strip(',')
                                 if ',' in listlinesep[-1]:
-                                    neww=listlinesep[i].split(',')
+                                    neww = listlinesep[i].split(',')
                                     listlinesep.pop(-1)
                                     for i in neww:
                                         listlinesep.append(i)
-                            if listlinesep[0][:-1]==label:
+                            if listlinesep[0][:-1] == label:
                                 break
-                    offset_encoding=(newprogramcounter - program_counter)// 2
-                    newimm=convert20bit(offset_encoding)
-                    rd=list_line_sep[1]
-                    bit_20=newimm[0]
-                    bits_10_1=newimm[10:20]
-                    bit_11=newimm[9]
-                    bits_19_12=newimm[1:9]
-                    binary_output+=(bit_20 + bits_10_1 + bit_11 + bits_19_12 +data["REGISTER_MAP"][rd] +data["OPCODES"][instruction])
+                    offset_encoding = (newprogramcounter - program_counter) // 2
+                    newimm = convert20bit(offset_encoding)
+                    rd = list_line_sep[1]
+                    bit_20 = newimm[0]
+                    bits_10_1 = newimm[10:20]
+                    bit_11 = newimm[9]
+                    bits_19_12 = newimm[1:9]
+                    binary_output += (bit_20 + bits_10_1 + bit_11 + bits_19_12 + data["REGISTER_MAP"][rd] + data["OPCODES"][instruction])
       
-        if(binary_output=="ERROR"):
+        if(binary_output == "ERROR"):
             print("ERROR")
             break
-        s+=binary_output+"\n"
-    with open(outputfile,"w") as shit:
+        s += binary_output + "\n"
+    with open(outputfile, "w") as shit:
         shit.write(s)
-
-      
