@@ -86,20 +86,12 @@ class Simulator:
 
         # Instruction type dictionaries
         self.R_type = { "00000000000110011": "ADD",
-                        
                         "00000001010110011": "SRL",
-                        
                         "00000000100110011": "SLT",
                         "01000000000110011": "SUB",
-                        
                         "00000001100110011": "OR",
                         "00000001110110011": "AND"
                         }
-        # Add bonus instructions with new unique keys
-        self.R_type["00000010000110011"] = "MUL"
-        self.R_type["00000010100110011"] = "RST"
-        self.R_type["00000011000110011"] = "HALT"
-        self.R_type["00000011100110011"] = "RVRS"
         
         self.I_type = { "0100000011": "LW",
                         "0000010011": "ADDI", 
@@ -192,16 +184,6 @@ class Simulator:
         rs1 = instruction[12:17]
         rs2 = instruction[7:12]
         rd = instruction[20:25]
-        # For bonus instructions RST and HALT, ignore the rd check.
-        if operation_type in ["RST", "HALT"]:
-            if operation_type == "RST":
-                for reg in self.Register_value:
-                    if reg != "00000":
-                        self.Register_value[reg] = 0
-                return
-            elif operation_type == "HALT":
-                sys.exit(0)
-        # For other instructions, follow the original rule to discard writes to register 00000.
         if rd == "00000":
             return
         else:
@@ -248,12 +230,6 @@ class Simulator:
                         x[i] = "1"
                 x = "".join(x)
                 self.Register_value[rd] = self.binary_to_decimal(x)
-                return
-            # Bonus instruction: Reverse bits of rs1 and store in rd (RVRS)
-            elif operation_type == "RVRS":
-                bin_str = self.decimal_to_binary(self.Register_value[rs1], 32)
-                reversed_bin_str = bin_str[::-1]
-                self.Register_value[rd] = self.binary_to_decimal(reversed_bin_str)
                 return
         return 
 
@@ -360,6 +336,52 @@ class Simulator:
     def run(self):
         i = 0
         while i < len(self.data_in_list):
+            # Check for bonus instructions.
+            # We assume bonus instructions have opcode "1111111" (bits [25:32])
+            if self.data_in_list[i][25:32] == "1111111":
+                # Use bits [11:16] as bonus function code
+                bonus_code = self.data_in_list[i][11:16]
+                if bonus_code == "00000":  # rst: reset all registers except PC (and x0 remains unchanged)
+                    for reg in self.Register_value:
+                        if reg != "00000":
+                            self.Register_value[reg] = 0
+                    i += 1
+                    self.PC = i * 4
+                    P = "0b" + self.decimal_to_binary(self.PC, 32)
+                    tem = str(self.PC)
+                    self.g.write(tem)
+                    self.g_b.write(P)
+                    self.print_values()
+                    continue
+                elif bonus_code == "00001":  # halt: stop execution
+                    self.PC = i * 4
+                    P = "0b" + self.decimal_to_binary(self.PC, 32)
+                    tem = str(self.PC)
+                    self.g.write(tem)
+                    self.g_b.write(P)
+                    self.print_values()
+                    break
+                elif bonus_code == "00010":  # rvrs: reverse the bits of register rs1 and store in rd
+                    rs1 = self.data_in_list[i][12:17]
+                    rd = self.data_in_list[i][20:25]
+                    bin_str = self.decimal_to_binary(self.Register_value[rs1], 32)
+                    rev_bin = bin_str[::-1]
+                    self.Register_value[rd] = self.binary_to_decimal(rev_bin)
+                    i += 1
+                    self.PC = i * 4
+                    P = "0b" + self.decimal_to_binary(self.PC, 32)
+                    tem = str(self.PC)
+                    self.g.write(tem)
+                    self.g_b.write(P)
+                    self.print_values()
+                    continue
+                else:
+                    self.g.write("Invalid bonus instruction")
+                    self.g_b.write("Invalid bonus instruction")
+                    i += 1
+                    self.PC = i * 4
+                    continue
+
             opcode = self.data_in_list[i][25:32]
             instruction_type = self.opcode_define[opcode]
             if instruction_type == "R":
