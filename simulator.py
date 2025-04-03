@@ -1,5 +1,5 @@
 import sys
-
+#simulator
 class Simulator:
     def __init__(self, input_file_name, output_file_name, output_file_name_R):
 
@@ -378,7 +378,7 @@ class Simulator:
                 else:
                     self.g.write("Invalid bonus instruction")
                     self.g_b.write("Invalid bonus instruction")
-                    i += 1
+                
                     self.PC = i * 4
                     break
 
@@ -448,7 +448,7 @@ class Simulator:
             else:
                 self.g.write("INVALID TILL NOW")
                 self.g.write("Invalid")
-                i = i + 1
+               
                 self.PC = i * 4
                 break
 
