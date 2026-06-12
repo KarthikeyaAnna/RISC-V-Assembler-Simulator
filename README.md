@@ -1,4 +1,3 @@
-Below is a **professional GitHub `README.md`** template for your RISC-V Assembler & Simulator. You can copy it directly into a `README.md` file.
 
 ---
 
