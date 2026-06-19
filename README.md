@@ -291,4 +291,4 @@ The assembler detects:
 
 ---
 
-This README is suitable for a **college project GitHub repository** and contains detailed ISA tables, binary formats, register maps, opcode tables, execution details, and usage instructions.
+
